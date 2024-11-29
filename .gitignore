@@ -1,0 +1,46 @@
+﻿# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# obj and bin directories
+obj/
+bin/
+
+# User-specific files
+.idea/
+.vs/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# JetBrains Rider
+.idea/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+
+# Build Results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Dd]ist/
+[Dd]istPublic/
+[Rr]elease/
+[Rr]eleasePublic/
+
+# Package directories (NuGet or other package managers)
+packages/
+/Properties/launchSettings.json
