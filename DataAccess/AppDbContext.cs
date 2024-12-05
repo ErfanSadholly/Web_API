@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Web_Api.Account_Models;
 using Web_Api.DbModels;
 
 namespace Web_Api.AppData

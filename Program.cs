@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Web_Api.Account_Models;
 using Web_Api.AppData;
+using Web_Api.AuthModels;
 using Web_Api.DbModels;
-using Web_Api.Jwt;
+using Web_Api.Interfaces;
+using Web_Api.Services;
 using Web_Api.Validations;
+using WebApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,8 +96,20 @@ Microsoft.AspNetCore.Authentication.AuthenticationBuilder authenticationBuilder 
 	};
 });
 
-builder.Services.AddValidatorsFromAssemblyContaining<PhoneBookDTOValidation>();
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<PhoneBookDTOValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidation>();
+builder.Services.AddValidatorsFromAssemblyContaining<LoginValidation>();
+
+
+builder.Services.AddScoped<IPhoneBook, PhoneBookRepository>();
+builder.Services.AddScoped<PhoneBookService>();
+builder.Services.AddScoped<IJwt, JwtService>();
+builder.Services.AddScoped<IAuthentication, AuthenticationService>();
+builder.Services.AddScoped<JwtService>();
+
+
+
 
 builder.Services.AddControllers();
 

@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 using Web_Api.AppData;
 using Web_Api.DbModels;
+using Web_Api.DTOs;
+using Web_Api.Interfaces;
+using Web_Api.Services;
+using WebApi.Repositories;
 
 
 namespace Web_Api.Controllers
@@ -10,135 +15,111 @@ namespace Web_Api.Controllers
 	[Authorize]
 	[Route("api/[controller]")]
 	[ApiController]
-	
+
 	public class ContactsController : ControllerBase
 	{
-		private readonly AppDbContext _context;
+		private readonly PhoneBookService _phoneBookService;
 
-		public ContactsController(AppDbContext context)
+		public ContactsController(PhoneBookService phoneBookService)
 		{
-			_context = context;
+			_phoneBookService = phoneBookService;
 		}
 
 		// GET: api/Contacts
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<PhoneBook>>> GetPhoneBooks()
+		public async Task<IActionResult> GetAll()
 		{
-			var phoneBooks = await _context.PhoneBooks
-										   .Where(p => !p.Deleted)
-										   .ToListAsync();
-			if (phoneBooks == null || !phoneBooks.Any())
+			try
 			{
-				return NotFound("!مخاطبی یافت نشد");
-			}
+				var phoneBooks = await _phoneBookService.GetAllAsync();
+				return Ok(phoneBooks);
 
-			return Ok(phoneBooks);
+			}
+			catch (KeyNotFoundException ex)
+			{
+
+				return NotFound(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
 		}
+
 		// GET: api/Contacts/5
 		[HttpGet("{id}")]
-		public async Task<ActionResult<PhoneBook>> GetPhoneBook(int id)
+		public async Task<IActionResult> GetById(int id)
 		{
-			var phoneBook = await _context.PhoneBooks.FindAsync(id);
-
-
-			if (phoneBook == null || phoneBook.Deleted)
+			try
 			{
-				return NotFound(".کاربر مورد نظر یافت نشد");
+				var phoneBook = await _phoneBookService.GetByIdAsync(id);
+				return Ok(phoneBook);
 			}
+			catch (KeyNotFoundException ex)
+			{
 
-			return Ok(phoneBook);
+				return NotFound(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
 		}
 
 		// PUT: api/Contacts/5
 		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPut("{id}")]
-		public async Task<IActionResult> PhoneBookDTO(int id, [FromBody] PhoneBookDTO PhoneBookDTO)
+		public async Task<IActionResult> Update(int id, [FromBody] PhoneBookDTO PhoneBookDTO)
 		{
-			if (!ModelState.IsValid)
+			try
 			{
-				return BadRequest(ModelState);
+				var phoneBook = await _phoneBookService.UpdateAsync(id, PhoneBookDTO);
+				return NoContent();
 			}
-
-			var phoneBook = await _context.PhoneBooks.FindAsync(id);
-			if (phoneBook == null || phoneBook.Deleted)
+			catch (KeyNotFoundException ex)
 			{
-				return NotFound(".کاربر مورد نظر یافت نشد");
+				return NotFound(ex.Message);
 			}
-
-			// به‌روزرسانی مقادیر بدون تغییر ID
-			phoneBook.FirstName = PhoneBookDTO.FirstName;
-			phoneBook.LastName = PhoneBookDTO.LastName;
-			phoneBook.PhoneNumber = PhoneBookDTO.PhoneNumber;
-
-			_context.PhoneBooks.Update(phoneBook);
-			await _context.SaveChangesAsync();
-
-			return Ok("اطلاعات مخاطب با موفقیت ویرایش شد.");
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
 		}
 
 		// POST: api/Contacts
 		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPost]
-		public async Task<ActionResult<PhoneBook>> PostPhoneBook(PhoneBookDTO PhoneBookDTO)
+		public async Task<IActionResult> Create([FromBody] PhoneBookDTO PhoneBookDTO)
 		{
-			var phoneBook = new PhoneBook
+			try
 			{
-				FirstName = PhoneBookDTO.FirstName,
-				LastName = PhoneBookDTO.LastName,
-				PhoneNumber = PhoneBookDTO.PhoneNumber,
-				Deleted = false
-			};
-
-			_context.PhoneBooks.Add(phoneBook);
-			await _context.SaveChangesAsync();
-
-			return CreatedAtAction("GetPhoneBook", new { id = phoneBook.ID }, phoneBook);
+				var phonebook = await _phoneBookService.CreateAsync(PhoneBookDTO);
+				return CreatedAtAction("GetById", new { id = phonebook.ID }, phonebook);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
 		}
 
 		// DELETE: api/Contacts/5
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeletePhoneBook(int id)
+		public async Task<IActionResult> Delete(int id)
 		{
-			var phoneBook = await _context.PhoneBooks.FindAsync(id);
-			if (phoneBook == null || phoneBook.Deleted)
+			try
 			{
-				return NotFound("!کابر یافت نشد");
+				await _phoneBookService.DeleteAsync(id);
+				return NoContent();
 			}
-
-			phoneBook.Deleted = true;
-
-			_context.PhoneBooks.Update(phoneBook);
-			await _context.SaveChangesAsync();
-
-			// پس از حذف رکورد، آیدی‌ها را مجدداً تنظیم می‌کنیم.
-			await ResetIds();
-
-			// دستور DBCC CHECKIDENT برای ریست کردن مقدار آیدی
-			var maxId = await _context.PhoneBooks.MaxAsync(c => (int?)c.ID) ?? 0;
-			await _context.Database.ExecuteSqlRawAsync($"DBCC CHECKIDENT ('PhoneBooks', RESEED, {maxId})");
-
-			return Ok("مخاطب با موفقیت حذف شد.");
-		}
-
-		private async Task ResetIds()
-		{
-			var activeRecords = await _context.PhoneBooks
-											   .Where(r => !r.Deleted)
-											   .OrderBy(r => r.ID)
-											   .ToListAsync();
-			int id = 1;  
-
-			foreach (var record in activeRecords)
+			catch (KeyNotFoundException ex)
 			{
-				record.ID = id++;  
+				return NotFound(ex.Message);
 			}
-
-			await _context.SaveChangesAsync();
-		}
-
-		private bool PhoneBookExists(int id)
-		{
-			return _context.PhoneBooks.Any(e => e.ID == id);
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			} 
 		}
 	}
 }
+

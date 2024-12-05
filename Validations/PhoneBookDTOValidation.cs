@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Web_Api.DbModels;
+using Web_Api.DTOs;
 
 namespace Web_Api.Validations
 {

@@ -1,4 +1,4 @@
-﻿namespace Web_Api.Jwt
+﻿namespace Web_Api.AuthModels
 {
 	public class JwtModel
 	{

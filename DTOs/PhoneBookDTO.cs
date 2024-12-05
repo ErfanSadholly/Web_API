@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web_Api.DbModels
+namespace Web_Api.DTOs
 {
 	public class PhoneBookDTO
 	{
