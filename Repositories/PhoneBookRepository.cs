@@ -7,9 +7,9 @@ namespace WebApi.Repositories
 {
 	public class PhoneBookRepository : IPhoneBook
 	{
-		private readonly AppDbContext _context;
+		private readonly IAppDbContext _context;
 
-		public PhoneBookRepository(AppDbContext context)
+		public PhoneBookRepository(IAppDbContext context)
 		{
 			_context = context;
 		}
@@ -38,7 +38,7 @@ namespace WebApi.Repositories
 
 		public async Task DeleteAsync(int id)
 		{
-			var phoneBook = await _context.PhoneBooks.FirstOrDefaultAsync(x => x.ID == id);
+			var phoneBook = await _context.PhoneBooks.FindAsync(id);
 			if (phoneBook != null)
 			{
 				phoneBook.Deleted = true;

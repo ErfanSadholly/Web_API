@@ -53,6 +53,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 //----------------------------------------------------------------------------------------------------
 builder.Services.AddIdentity<User, Role>(Options =>
 {
@@ -73,6 +74,7 @@ builder.Services.AddIdentity<User, Role>(Options =>
 // Add Secret.json
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
 builder.Configuration.AddJsonFile("Secret.json", optional: false, reloadOnChange: true);
+
 builder.Services.Configure<JwtModel>(builder.Configuration.GetSection("JwtModel"));
 
 Microsoft.AspNetCore.Authentication.AuthenticationBuilder authenticationBuilder = builder.Services.AddAuthentication(options =>
@@ -107,8 +109,6 @@ builder.Services.AddScoped<PhoneBookService>();
 builder.Services.AddScoped<IJwt, JwtService>();
 builder.Services.AddScoped<IAuthentication, AuthenticationService>();
 builder.Services.AddScoped<JwtService>();
-
-
 
 
 builder.Services.AddControllers();
