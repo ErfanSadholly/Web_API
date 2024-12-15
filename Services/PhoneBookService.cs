@@ -14,29 +14,48 @@ namespace Web_Api.Services
 			_phoneBookRepository = phoneBookRepository;
 		}
 
-		public async Task<IEnumerable<PhoneBook>> GetAllAsync()
+		public async Task<GeneralBasicResponseDto<List<PhoneBook>>> GetAllAsync()
 		{
 			var phoneBook = await _phoneBookRepository.GetAllAsync();
-			if (!phoneBook.Any()) 
+			if (!phoneBook.Any())
 			{
-				throw new KeyNotFoundException(".هیچ مخاطبی یافت نشد");
-			}
+				return new GeneralBasicResponseDto<List<PhoneBook>>
+				{
+					IsSuccess = false,
+					Message = ".هیچ مخاطبی یافت نشد",
+					Data = null
 
-			return phoneBook;
+				};
+			}
+			return new GeneralBasicResponseDto<List<PhoneBook>>
+			{
+				IsSuccess = true,
+				Message = ".مخاطبین با موفقیت بازیابی شدند",
+				Data = phoneBook.ToList()
+			};
 		}
 
-		public async Task<PhoneBook> GetByIdAsync(int id) 
+		public async Task<GeneralBasicResponseDto<PhoneBook>> GetByIdAsync(int id)
 		{
 			var phoneBook = await _phoneBookRepository.GetByIdAsync(id);
 			if (phoneBook == null || phoneBook.Deleted)
 			{
-				throw new KeyNotFoundException("!مخاطب مورد نظر یافت نشد");	
+				return new GeneralBasicResponseDto<PhoneBook>
+				{
+					IsSuccess = false,
+					Message = "!مخاطب مورد نظر یافت نشد",
+					Data = null
+				};
 			}
-
-			return phoneBook;
+			return new GeneralBasicResponseDto<PhoneBook>
+			{
+				IsSuccess = true,
+				Message = ".مخاطب با موفقیت بازیابی شد",
+				Data = phoneBook
+			};
 		}
 
-		public async Task<PhoneBook> CreateAsync(PhoneBookDTO phoneBookDTO) 
+		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookDTO phoneBookDTO) 
 		{
 			var phonebook = new PhoneBook()
 			{
@@ -47,15 +66,25 @@ namespace Web_Api.Services
 			};
 
 			await _phoneBookRepository.CreateAsync(phonebook);
-			return phonebook;
+			return new GeneralBasicResponseDto<PhoneBook>
+			{
+				IsSuccess = true,
+				Message = ".مخاطب جدید با موفقیت ایجاد شد",
+				Data = phonebook
+			};
 		}
 
-		public async Task<PhoneBook> UpdateAsync(int id, PhoneBookDTO phoneBookDTO)
+		public async Task<GeneralBasicResponseDto<PhoneBook>> UpdateAsync(int id, PhoneBookDTO phoneBookDTO)
 		{
 			var phonebook = await _phoneBookRepository.GetByIdAsync(id);
 			if (phonebook == null || phonebook.Deleted)
 			{
-				throw new KeyNotFoundException("!مخاطب مورد نظر یافت نشد");
+				return new GeneralBasicResponseDto<PhoneBook>
+				{
+					IsSuccess = false,
+					Message = "!مخاطب مورد نظر یافت نشد",
+					Data = null
+				};
 			}
 
 			phonebook.FirstName = phoneBookDTO.FirstName;
@@ -63,23 +92,35 @@ namespace Web_Api.Services
 			phonebook.PhoneNumber = phoneBookDTO.PhoneNumber;
 
 			await _phoneBookRepository.UpdateAsync(phonebook);
-			return phonebook;
+			return new GeneralBasicResponseDto<PhoneBook>
+			{
+				IsSuccess = true,
+				Message = ".مخاطب با موفقیت به‌روز رسانی شد",
+				Data = phonebook
+			};
 		}
 
-		public async Task DeleteAsync(int id) 
+		public async Task<GeneralBasicResponseDto<PhoneBook>> DeleteAsync(int id) 
 		{
 			var contact = await _phoneBookRepository.GetByIdAsync(id);
 
 			if (contact == null) 
 			{
-				throw new KeyNotFoundException("!مخاطب مورد نظر یافت نشد");
-			}
-			if (contact.Deleted) 
-			{
-				throw new KeyNotFoundException("!مخاطب مورد نظر قبلا حذف شده است");
+				return new GeneralBasicResponseDto<PhoneBook>
+				{
+					IsSuccess = false,
+					Message = "!مخاطب مورد نظر یافت نشد",
+					Data = null
+				};
 			}
 
 			await _phoneBookRepository.DeleteAsync(id);
+			return new GeneralBasicResponseDto<PhoneBook>
+			{
+				IsSuccess = true,
+				Message = ".مخاطب با موفقیت حذف شد",
+				Data = null
+			};
 		}
 	}
 }

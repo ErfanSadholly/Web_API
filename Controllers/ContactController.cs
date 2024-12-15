@@ -31,13 +31,16 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var phoneBooks = await _phoneBookService.GetAllAsync();
-				return Ok(phoneBooks);
+				var response = await _phoneBookService.GetAllAsync();
+				if (!response.IsSuccess) 
+				{
+					return NotFound(response.Message);
+				}
 
+				return Ok(response.Data);
 			}
 			catch (KeyNotFoundException ex)
 			{
-
 				return NotFound(ex.Message);
 			}
 			catch (Exception ex)
@@ -52,12 +55,16 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var phoneBook = await _phoneBookService.GetByIdAsync(id);
-				return Ok(phoneBook);
+				var response = await _phoneBookService.GetByIdAsync(id);
+				if (!response.IsSuccess) 
+				{
+					return NotFound(response.Message);
+				}
+
+				return Ok(response.Data);
 			}
 			catch (KeyNotFoundException ex)
-			{
-
+			{ 
 				return NotFound(ex.Message);
 			}
 			catch (Exception ex)
@@ -73,7 +80,12 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var phoneBook = await _phoneBookService.UpdateAsync(id, PhoneBookDTO);
+				var response = await _phoneBookService.UpdateAsync(id, PhoneBookDTO);
+				if (!response.IsSuccess) 
+				{
+					return NotFound(response.Message);
+				}
+
 				return NoContent();
 			}
 			catch (KeyNotFoundException ex)
@@ -93,8 +105,13 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var phonebook = await _phoneBookService.CreateAsync(PhoneBookDTO);
-				return CreatedAtAction("GetById", new { id = phonebook.ID }, phonebook);
+				var response = await _phoneBookService.CreateAsync(PhoneBookDTO);
+				if(!response.IsSuccess) 
+				{
+					return BadRequest(response.Message);
+				}
+
+				return CreatedAtAction("GetById", new { id = response.Data.ID }, response);
 			}
 			catch (Exception ex)
 			{
@@ -108,7 +125,12 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				await _phoneBookService.DeleteAsync(id);
+				var response = await _phoneBookService.DeleteAsync(id);
+				if (!response.IsSuccess) 
+				{
+					return NotFound(response.Message);
+				}
+
 				return NoContent();
 			}
 			catch (KeyNotFoundException ex)
