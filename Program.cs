@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -103,6 +104,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<PhoneBookDTOValidation>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidation>();
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidation>();
 
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<IPhoneBook, PhoneBookRepository>();
 builder.Services.AddScoped<PhoneBookService>();

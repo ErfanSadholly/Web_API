@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Web_Api.DbModels;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
@@ -8,10 +10,12 @@ namespace Web_Api.Services
 	public class PhoneBookService
 	{
 		private readonly IPhoneBook _phoneBookRepository;
+		private readonly IMapper _mapper;
 
-		public PhoneBookService (IPhoneBook phoneBookRepository) 
+		public PhoneBookService (IPhoneBook phoneBookRepository , IMapper mapper) 
 		{
 			_phoneBookRepository = phoneBookRepository;
+			_mapper = mapper;
 		}
 
 		public async Task<GeneralBasicResponseDto<List<PhoneBook>>> GetAllAsync()
@@ -57,13 +61,8 @@ namespace Web_Api.Services
 
 		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookDTO phoneBookDTO) 
 		{
-			var phonebook = new PhoneBook()
-			{
-				FirstName = phoneBookDTO.FirstName,
-				LastName = phoneBookDTO.LastName,
-				PhoneNumber = phoneBookDTO.PhoneNumber,
-				Deleted = false
-			};
+			var phonebook = _mapper.Map<PhoneBook>(phoneBookDTO);
+			phonebook.Deleted = false;
 
 			await _phoneBookRepository.CreateAsync(phonebook);
 			return new GeneralBasicResponseDto<PhoneBook>
@@ -87,11 +86,10 @@ namespace Web_Api.Services
 				};
 			}
 
-			phonebook.FirstName = phoneBookDTO.FirstName;
-			phonebook.LastName = phoneBookDTO.LastName;
-			phonebook.PhoneNumber = phoneBookDTO.PhoneNumber;
+			_mapper.Map(phoneBookDTO, phonebook);
 
 			await _phoneBookRepository.UpdateAsync(phonebook);
+			
 			return new GeneralBasicResponseDto<PhoneBook>
 			{
 				IsSuccess = true,
@@ -121,6 +119,10 @@ namespace Web_Api.Services
 				Message = ".مخاطب با موفقیت حذف شد",
 				Data = null
 			};
+		}
+		public PhoneBookDTO GetPhoneBook(PhoneBook phoneBook)
+		{
+			return _mapper.Map<PhoneBookDTO>(phoneBook);
 		}
 	}
 }

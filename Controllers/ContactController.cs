@@ -86,7 +86,7 @@ namespace Web_Api.Controllers
 					return NotFound(response.Message);
 				}
 
-				return NoContent();
+				return Ok(response.Message);
 			}
 			catch (KeyNotFoundException ex)
 			{
@@ -131,7 +131,7 @@ namespace Web_Api.Controllers
 					return NotFound(response.Message);
 				}
 
-				return NoContent();
+				return Ok(response.Message);
 			}
 			catch (KeyNotFoundException ex)
 			{

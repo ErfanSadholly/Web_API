@@ -21,43 +21,42 @@ namespace Web_Api.Controllers
 		[HttpPost("Register")]
 		public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
 		{
-			var user = new User
-			{
-				UserName = registerModel.Email,
-				Email = registerModel.Email
-			};
-
 			try
-			{
+			{		
 				var result = await _authentication.RegisterAsync(registerModel);
-				if (!result.Succeeded)
+	
+				if (!result.IsSuccess)
 				{
-					return BadRequest(result.Errors);
+					return BadRequest(result.Message);
 				}
-
-				return Ok("ثبت نام موفقیت‌آمیز بود");
+		
+				return Ok(result.Message);
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
-			} 
+				return StatusCode(500, $"خطای داخلی سرور: {ex.Message}");
+			}
 		}
-
 		[HttpPost("Login")]
 		public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
 		{
 			try
 			{
-				var token = await _authentication.LoginAsync(loginModel);
-				return Ok(new { token });
+				var result = await _authentication.LoginAsync(loginModel);
+				if (!result.IsSuccess)
+				{
+					return Unauthorized(result.Message); 
+				}
+
+				return Ok(new { message = "ورود موفقیت‌آمیز", token = result.Data });
 			}
 			catch (UnauthorizedAccessException ex)
 			{
-				return Unauthorized(ex.Message);
+				return Unauthorized(ex.Message);  
 			}
 			catch (Exception ex)
 			{
-				return BadRequest(ex.Message);
+				return StatusCode(500, $"خطای داخلی سرور: {ex.Message}"); 
 			}
 		}
 	}
