@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using System.Security.Claims;
 using Web_Api.AppData;
-using Web_Api.DbModels;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Services;
@@ -12,7 +13,7 @@ using WebApi.Repositories;
 
 namespace Web_Api.Controllers
 {
-	[Authorize]
+
 	[Route("api/[controller]")]
 	[ApiController]
 
@@ -76,17 +77,19 @@ namespace Web_Api.Controllers
 		// PUT: api/Contacts/5
 		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPut("{id}")]
-		public async Task<IActionResult> Update(int id, [FromBody] PhoneBookDTO PhoneBookDTO)
+		public async Task<IActionResult> Update(int id, [FromBody] PhoneBookWriteDTO PhoneBookDTO)
 		{
 			try
 			{
-				var response = await _phoneBookService.UpdateAsync(id, PhoneBookDTO);
+				var userId = User.Identity.Name;
+
+				var response = await _phoneBookService.UpdateAsync(id, PhoneBookDTO, userId);
 				if (!response.IsSuccess) 
 				{
 					return NotFound(response.Message);
 				}
 
-				return Ok(response.Message);
+				return Ok(response.Data);
 			}
 			catch (KeyNotFoundException ex)
 			{
@@ -101,11 +104,13 @@ namespace Web_Api.Controllers
 		// POST: api/Contacts
 		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 		[HttpPost]
-		public async Task<IActionResult> Create([FromBody] PhoneBookDTO PhoneBookDTO)
+		public async Task<IActionResult> Create([FromBody] PhoneBookWriteDTO PhoneBookDTO)
 		{
 			try
 			{
-				var response = await _phoneBookService.CreateAsync(PhoneBookDTO);
+				var userId = User.Identity.Name;
+
+				var response = await _phoneBookService.CreateAsync(PhoneBookDTO, userId);
 				if(!response.IsSuccess) 
 				{
 					return BadRequest(response.Message);
@@ -131,7 +136,7 @@ namespace Web_Api.Controllers
 					return NotFound(response.Message);
 				}
 
-				return Ok(response.Message);
+				return Ok(response.Data);
 			}
 			catch (KeyNotFoundException ex)
 			{
@@ -144,4 +149,3 @@ namespace Web_Api.Controllers
 		}
 	}
 }
-

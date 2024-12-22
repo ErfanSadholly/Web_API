@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Web_Api.Account_Models;
-using Web_Api.DbModels;
 using Web_Api.Interfaces;
+using Web_Api.Models.AuthModels;
 using Web_Api.Services;
 
 namespace Web_Api.Controllers
@@ -48,7 +47,7 @@ namespace Web_Api.Controllers
 					return Unauthorized(result.Message); 
 				}
 
-				return Ok(new { message = "ورود موفقیت‌آمیز", token = result.Data });
+				return Ok(new { token = result.Data });
 			}
 			catch (UnauthorizedAccessException ex)
 			{
@@ -61,4 +60,3 @@ namespace Web_Api.Controllers
 		}
 	}
 }
-			

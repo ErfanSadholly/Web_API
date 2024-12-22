@@ -1,8 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace Web_Api.DTOs
 {
-	public class PhoneBookDTO
+	public class PhoneBookWriteDTO
 	{
 		public string FirstName { get; set; }
 		public string LastName { get; set; }

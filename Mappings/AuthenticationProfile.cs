@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Web_Api.Account_Models;
-using Web_Api.DbModels;
+using Web_Api.Models.AuthModels;
+using Web_Api.Models.DbModels;
 
 namespace Web_Api.Mappings
 {

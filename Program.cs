@@ -8,9 +8,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Web_Api.AppData;
-using Web_Api.AuthModels;
-using Web_Api.DbModels;
 using Web_Api.Interfaces;
+using Web_Api.Models.AuthModels;
+using Web_Api.Models.DbModels;
 using Web_Api.Services;
 using Web_Api.Validations;
 using WebApi.Repositories;
@@ -108,6 +108,9 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<IPhoneBook, PhoneBookRepository>();
 builder.Services.AddScoped<PhoneBookService>();
+
+builder.Services.AddScoped<LoggableEntityService>();
+
 builder.Services.AddScoped<IJwt, JwtService>();
 builder.Services.AddScoped<IAuthentication, AuthenticationService>();
 builder.Services.AddScoped<JwtService>();

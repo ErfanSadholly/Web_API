@@ -3,9 +3,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Web_Api.AuthModels;
-using Web_Api.DbModels;
 using Web_Api.Interfaces;
+using Web_Api.Models.AuthModels;
+using Web_Api.Models.DbModels;
 
 namespace Web_Api.Services
 {
@@ -24,6 +24,7 @@ namespace Web_Api.Services
 		{
 			var claims = new[]
 			{
+			new Claim(ClaimTypes.Name, user.Id.ToString()),
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 			new Claim(ClaimTypes.Email, user.Email),
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),

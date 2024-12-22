@@ -1,8 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Web_Api.Migrations;
 
-namespace Web_Api.DbModels
+
+namespace Web_Api.Models.DbModels
 {
-	public class PhoneBook
+	public class PhoneBook : Loggable.LoggableEntity
 	{
 		public int ID { get; set; }
 		public string? FirstName { get; set; }

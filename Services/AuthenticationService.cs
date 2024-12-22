@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
-using Web_Api.Account_Models;
-using Web_Api.DbModels;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
+using Web_Api.Models.AuthModels;
+using Web_Api.Models.DbModels;
 
 namespace Web_Api.Services
 {
@@ -44,7 +44,6 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<User>
 				{
 					IsSuccess = true,
-					Message = ".کاربر با موفقیت ثبت شد",
 					Data = user
 				};
 			}
@@ -87,7 +86,6 @@ namespace Web_Api.Services
 			return new GeneralBasicResponseDto<string>
 			{
 				IsSuccess = true,
-				Message = ".ورود با موفقیت انجام شد",
 				Data = token
 			};
 		}

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Web_Api.Account_Models;
+using Web_Api.Models.AuthModels;
 
 namespace Web_Api.Validations
 {

@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
+using NuGet.Protocol;
 using Web_Api.DTOs;
 
 namespace Web_Api.Validations
 {
-	public class PhoneBookDTOValidation : AbstractValidator<PhoneBookDTO>
+	public class PhoneBookDTOValidation : AbstractValidator<PhoneBookWriteDTO>
 	{
 		public PhoneBookDTOValidation()
 		{

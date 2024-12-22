@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Web_Api.DbModels;
 using Web_Api.DTOs;
+using Web_Api.Models.DbModels;
 
 namespace Web_Api.Mappings
 {
@@ -8,7 +8,13 @@ namespace Web_Api.Mappings
 	{
 		public PhoneBookProfile()
 		{
-			CreateMap<PhoneBook, PhoneBookDTO>().ReverseMap();
+			// Mapping برای GetAll
+			// Mapping برای GetById
+			CreateMap<PhoneBook, PhoneBookReadDto>().ReverseMap();
+				
+			//Mapping برای Create
+			//Mapping برای Update
+			CreateMap<PhoneBook, PhoneBookWriteDTO>().ReverseMap();
 		}
 	}
 }

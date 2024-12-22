@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Web_Api.DbModels;
 using Web_Api.Interfaces;
+using Web_Api.Models.DbModels;
 
 namespace Web_Api.AppData
 {
@@ -21,7 +21,19 @@ namespace Web_Api.AppData
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
+
 			builder.Entity<PhoneBook>().HasQueryFilter(p => !p.Deleted);
+
+			builder.Entity<PhoneBook>(entity =>
+			{
+				entity.Property(e => e.CreatedOn).IsRequired();
+
+				entity.Property(e => e.CreatedBy).HasMaxLength(100);
+
+				entity.Property(e => e.ModifiedOn).IsRequired(false);
+
+				entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+			});
 		}
 	}
 }

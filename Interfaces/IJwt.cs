@@ -1,4 +1,4 @@
-﻿using Web_Api.DbModels;
+﻿using Web_Api.Models.DbModels;
 
 namespace Web_Api.Interfaces
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web_Api.Account_Models
+namespace Web_Api.Models.AuthModels
 {
 	public class RegisterModel
 	{
