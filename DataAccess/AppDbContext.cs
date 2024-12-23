@@ -26,13 +26,19 @@ namespace Web_Api.AppData
 
 			builder.Entity<PhoneBook>(entity =>
 			{
-				entity.Property(e => e.CreatedOn).IsRequired();
+				entity.Property(e => e.CreatedOn).IsRequired().HasColumnType("datetime");
 
-				entity.Property(e => e.CreatedBy).HasMaxLength(100);
+				entity.Property(e => e.CreatedBy).IsRequired().HasColumnType("int");
 
-				entity.Property(e => e.ModifiedOn).IsRequired(false);
+				entity.Property(e => e.ModifiedOn).IsRequired(false).HasColumnType("datetime");
 
-				entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+				entity.Property(e => e.ModifiedBy).IsRequired().HasColumnType("int");
+
+				entity.Property(e => e.FirstName).HasColumnType("nvarchar(100)");
+
+				entity.Property(e => e.LastName).HasColumnType("nvarchar(100)");
+
+				entity.Property(e => e.PhoneNumber).HasColumnType("varchar(50)");
 			});
 		}
 	}

@@ -111,6 +111,8 @@ builder.Services.AddScoped<PhoneBookService>();
 
 builder.Services.AddScoped<LoggableEntityService>();
 
+builder.Services.AddScoped<ClaimService, ClaimService>();
+
 builder.Services.AddScoped<IJwt, JwtService>();
 builder.Services.AddScoped<IAuthentication, AuthenticationService>();
 builder.Services.AddScoped<JwtService>();

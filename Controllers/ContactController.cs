@@ -20,10 +20,13 @@ namespace Web_Api.Controllers
 	public class ContactsController : ControllerBase
 	{
 		private readonly PhoneBookService _phoneBookService;
+		private readonly ClaimService _claimService;
+		
 
-		public ContactsController(PhoneBookService phoneBookService)
+		public ContactsController(PhoneBookService phoneBookService,ClaimService claimService)
 		{
 			_phoneBookService = phoneBookService;
+			_claimService = claimService;
 		}
 
 		// GET: api/Contacts
@@ -81,7 +84,7 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var userId = User.Identity.Name;
+				var userId = _claimService.GetUserIdFromClaims(User); // استخراج userId از Claims
 
 				var response = await _phoneBookService.UpdateAsync(id, PhoneBookDTO, userId);
 				if (!response.IsSuccess) 
@@ -108,7 +111,7 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var userId = User.Identity.Name;
+				var userId = _claimService.GetUserIdFromClaims(User);
 
 				var response = await _phoneBookService.CreateAsync(PhoneBookDTO, userId);
 				if(!response.IsSuccess) 

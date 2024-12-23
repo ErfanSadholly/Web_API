@@ -66,7 +66,7 @@ namespace Web_Api.Services
 				Data = entityDto
 			};
 		}
-		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookWriteDTO phoneBookDTO, string userId)
+		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookWriteDTO phoneBookDTO, int userId)
 		{
 			var phonebook = _mapper.Map<PhoneBook>(phoneBookDTO);
 
@@ -81,7 +81,7 @@ namespace Web_Api.Services
 			};
 		}
 
-		public async Task<GeneralBasicResponseDto<PhoneBook>> UpdateAsync(int id, PhoneBookWriteDTO phoneBookDTO , string userId)
+		public async Task<GeneralBasicResponseDto<PhoneBook>> UpdateAsync(int id, PhoneBookWriteDTO phoneBookDTO , int userId)
 		{
 			var phonebook = await _phoneBookRepository.GetByIdAsync(id);
 			if (phonebook == null || phonebook.Deleted)
