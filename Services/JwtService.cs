@@ -24,12 +24,12 @@ namespace Web_Api.Services
 		{
 			var claims = new[]
 			{
-			new Claim(ClaimTypes.Name, user.Id.ToString()),
-			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-			new Claim(ClaimTypes.Email, user.Email),
-			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-		};
+				new Claim(ClaimTypes.Name, user.Id.ToString()),
+				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+				new Claim(ClaimTypes.Email, user.Email),
+				new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			};
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtModel.SecretKey));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);

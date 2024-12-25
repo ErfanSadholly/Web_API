@@ -7,6 +7,7 @@ using System.Security.Claims;
 using Web_Api.AppData;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
+using Web_Api.Models.DbModels;
 using Web_Api.Services;
 using WebApi.Repositories;
 
@@ -116,7 +117,7 @@ namespace Web_Api.Controllers
 				var response = await _phoneBookService.CreateAsync(PhoneBookDTO, userId);
 				if(!response.IsSuccess) 
 				{
-					return BadRequest(response.Message);
+					return BadRequest(response.Data.ID);
 				}
 
 				return CreatedAtAction("GetById", new { id = response.Data.ID }, response);
@@ -133,13 +134,19 @@ namespace Web_Api.Controllers
 		{
 			try
 			{
-				var response = await _phoneBookService.DeleteAsync(id);
+				var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+				{
+					return Unauthorized("کاربر شناسایی نشد یا اطلاعات معتبر نیست.");
+				}
+
+				var response = await _phoneBookService.DeleteAsync(id, userId);
 				if (!response.IsSuccess) 
 				{
 					return NotFound(response.Message);
 				}
 
-				return Ok(response.Data);
+				return Ok(response.Data.ID);
 			}
 			catch (KeyNotFoundException ex)
 			{

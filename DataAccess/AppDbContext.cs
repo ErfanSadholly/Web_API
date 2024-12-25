@@ -26,20 +26,43 @@ namespace Web_Api.AppData
 
 			builder.Entity<PhoneBook>(entity =>
 			{
-				entity.Property(e => e.CreatedOn).IsRequired().HasColumnType("datetime");
+				entity.Property(p => p.CreatedOn)
+				.IsRequired()
+				.HasColumnType("datetime");
 
-				entity.Property(e => e.CreatedBy).IsRequired().HasColumnType("int");
+				entity.Property(p => p.CreatedBy)
+				.IsRequired()
+				.HasColumnType("int");
 
-				entity.Property(e => e.ModifiedOn).IsRequired(false).HasColumnType("datetime");
+				entity.Property(p => p.ModifiedOn)
+				.IsRequired(false)
+				.HasColumnType("datetime");
 
-				entity.Property(e => e.ModifiedBy).IsRequired().HasColumnType("int");
+				entity.Property(p => p.ModifiedBy)
+				.IsRequired(false)
+				.HasColumnType("int");
 
-				entity.Property(e => e.FirstName).HasColumnType("nvarchar(100)");
+				entity.Property(p => p.FirstName)
+				.HasColumnType("nvarchar(100)");
 
-				entity.Property(e => e.LastName).HasColumnType("nvarchar(100)");
+				entity.Property(p => p.LastName)
+				.HasColumnType("nvarchar(100)");
 
-				entity.Property(e => e.PhoneNumber).HasColumnType("varchar(50)");
+				entity.Property(p => p.PhoneNumber)
+				.HasColumnType("varchar(50)");
 			});
+
+			builder.Entity<User>(entity =>
+			{
+				entity.Property(u => u.FirstName)
+				.HasColumnType("nvarchar(100)")
+				.IsRequired();
+
+				entity.Property(u => u.LastName)
+				.HasColumnType("nvarchar(100)")
+				.IsRequired();
+			});
+
 		}
 	}
 }

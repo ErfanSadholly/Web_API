@@ -1,7 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -18,9 +17,9 @@ using WebApi.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+//--------------------------------------------------------------------------------------------------------// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//Add Swagger For Token 
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -50,12 +49,16 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 //--------------------------------------------------------------------------------------------------------
+//Add Sql Connection
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
+
 //----------------------------------------------------------------------------------------------------
+//Add Jwt
+
 builder.Services.AddIdentity<User, Role>(Options =>
 {
 	Options.Password.RequiredLength = 5;
@@ -73,6 +76,7 @@ builder.Services.AddIdentity<User, Role>(Options =>
 
 //-----------------------------------------------------------------------------------------------------
 // Add Secret.json
+
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
 builder.Configuration.AddJsonFile("Secret.json", optional: false, reloadOnChange: true);
 
@@ -99,6 +103,11 @@ Microsoft.AspNetCore.Authentication.AuthenticationBuilder authenticationBuilder 
 	};
 });
 
+//-----------------------------------------------------------------------------------------------------
+//Configurations
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<PhoneBookDTOValidation>();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidation>();
@@ -116,6 +125,8 @@ builder.Services.AddScoped<ClaimService, ClaimService>();
 builder.Services.AddScoped<IJwt, JwtService>();
 builder.Services.AddScoped<IAuthentication, AuthenticationService>();
 builder.Services.AddScoped<JwtService>();
+
+builder.Services.AddScoped<IDatabaseAccess, DatabaseAccess>();
 
 
 builder.Services.AddControllers();

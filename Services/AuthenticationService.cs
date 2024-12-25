@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using System.Security.Claims;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.AuthModels;
@@ -13,12 +14,14 @@ namespace Web_Api.Services
 		private readonly UserManager<User> _userManager;
 		private readonly JwtService _jwtService;
 		private readonly IMapper _mapper;
+		private readonly IHttpContextAccessor _contextAccessor;
 
-		public AuthenticationService(UserManager<User> userManager, JwtService jwtService, IMapper mapper)
+		public AuthenticationService(UserManager<User> userManager, JwtService jwtService, IMapper mapper, IHttpContextAccessor contextAccessor)
 		{
 			_userManager = userManager;
 			_jwtService = jwtService;
 			_mapper = mapper;
+			_contextAccessor = contextAccessor;
 		}
 
 		public async Task<GeneralBasicResponseDto<User>> RegisterAsync(RegisterModel registerModel) 
@@ -89,5 +92,14 @@ namespace Web_Api.Services
 				Data = token
 			};
 		}
+		//public int GetCurrentUserId()
+		//{
+		//	var userIdString = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		//	if (int.TryParse(userIdString, out var userId)) 
+		//	{
+		//		return userId;
+		//	}
+		//	return -1; // یا هر مقدار پیش‌فرض که مناسب است
+		//}
 	}
 }

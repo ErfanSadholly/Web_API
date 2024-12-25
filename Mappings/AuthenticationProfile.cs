@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Web_Api.Models.AuthModels;
 using Web_Api.Models.DbModels;
 
@@ -10,7 +11,9 @@ namespace Web_Api.Mappings
 		{
 			CreateMap<RegisterModel, User>()
 				.ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email)) // تطابق با UserName
-				.ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));  // تطابق با Email
+				.ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))// تطابق با Email
+				.ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+				.ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName));
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿
-namespace Web_Api.DTOs
+﻿namespace Web_Api.DTOs
 {
 	public class PhoneBookWriteDTO
 	{
