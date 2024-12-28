@@ -47,13 +47,13 @@ namespace Web_Api.Services
 				var dto = _mapper.Map<PhoneBookReadDto>(phone);
 
 
-				var createdByUser = await _databaseAccess.GetUserFullName(phone.CreatedBy);
+				var createdByUser = await _databaseAccess.GetUserFullNameWithEF(phone.CreatedBy);
 				dto.CreatedBy = createdByUser;
 
 
 				if (phone.ModifiedBy.HasValue)
 				{
-					var modifiedByUser = await _databaseAccess.GetUserFullName(phone.ModifiedBy.Value);
+					var modifiedByUser = await _databaseAccess.GetUserFullNameWithEF(phone.ModifiedBy.Value);
 					dto.ModifiedBy = modifiedByUser;
 				}
 				else
@@ -64,16 +64,6 @@ namespace Web_Api.Services
 				var canEdit = await _databaseAccess.CanEditPhoneBook(phone.CreatedBy, phone.ID);
 
 				var userId = _claimService.GetUserIdFromClaims(_httpContext.HttpContext.User);
-				if (userId == -1)
-				{
-					return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
-					{
-						IsSuccess = false,
-						Message = "کاربر شناسایی نشد",
-						Data = null
-					};
-				}
-
 				dto.AllowEdit = phone.CreatedBy == userId;
 
 				dtos.Add(dto);
@@ -102,13 +92,13 @@ namespace Web_Api.Services
 			var entityDto = _mapper.Map<PhoneBookReadDto>(phoneBook);
 
 			// دریافت نام و نام خانوادگی کاربر ایجادکننده
-			var createdByUser = await _databaseAccess.GetUserFullName(phoneBook.CreatedBy);
+			var createdByUser = await _databaseAccess.GetUserFullNameWithEF(phoneBook.CreatedBy);
 			entityDto.CreatedBy = createdByUser;
 
 			// اگر اطلاعات مربوط به کاربر ویرایش‌کننده موجود است
 			if (phoneBook.ModifiedBy.HasValue)
 			{
-				var modifiedByUser = await _databaseAccess.GetUserFullName(phoneBook.ModifiedBy.Value);
+				var modifiedByUser = await _databaseAccess.GetUserFullNameWithEF(phoneBook.ModifiedBy.Value);
 				entityDto.ModifiedBy = modifiedByUser;
 			}
 			else
@@ -116,16 +106,30 @@ namespace Web_Api.Services
 				entityDto.ModifiedBy = string.Empty; // اگر هیچ تغییری توسط کاربری انجام نشده باشد
 			}
 
+			var canEdit = _databaseAccess.CanEditPhoneBook(phoneBook.CreatedBy, phoneBook.ID);
+			var UserId = _claimService.GetUserIdFromClaims(_httpContext.HttpContext.User);
+			if (UserId == -1)
+			{
+				return new GeneralBasicResponseDto<PhoneBookReadDto>
+				{
+					IsSuccess = false,
+					Message = "کاربر شناسایی نشد",
+					Data = null
+				};
+			}
+
+			entityDto.AllowEdit = phoneBook.CreatedBy == UserId;
+
 			return new GeneralBasicResponseDto<PhoneBookReadDto>()
 			{
 				IsSuccess = true,
 				Data = entityDto
 			};
 		}
-
-		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookWriteDTO phoneBookDTO, int userId)
+		
+		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookWriteDTO writeDTO, int userId)
 		{
-			var phonebook = _mapper.Map<PhoneBook>(phoneBookDTO);
+			var phonebook = _mapper.Map<PhoneBook>(writeDTO);
 
 			_loggableService.SetLoggableEntity(phonebook, userId, true);
 

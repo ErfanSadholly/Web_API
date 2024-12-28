@@ -1,15 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Web_Api.AppData;
 using Web_Api.DTOs;
-using Web_Api.Interfaces;
-using Web_Api.Models.DbModels;
 using Web_Api.Services;
-using WebApi.Repositories;
+
 
 
 namespace Web_Api.Controllers
@@ -22,9 +15,9 @@ namespace Web_Api.Controllers
 	{
 		private readonly PhoneBookService _phoneBookService;
 		private readonly ClaimService _claimService;
-		
 
-		public ContactsController(PhoneBookService phoneBookService,ClaimService claimService)
+
+		public ContactsController(PhoneBookService phoneBookService, ClaimService claimService)
 		{
 			_phoneBookService = phoneBookService;
 			_claimService = claimService;

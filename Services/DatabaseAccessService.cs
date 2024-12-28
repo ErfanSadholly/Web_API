@@ -1,15 +1,22 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using AutoMapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+
 using Web_Api.Interfaces;
+using Web_Api.Models.DbModels;
+
 
 namespace Web_Api.Services
 {
-	public class DatabaseAccess : IDatabaseAccess
+	public class DatabaseAccessService : IDatabaseAccess
 	{
 		private readonly string _connectionString;
+		private readonly IAppDbContext _DbContext;
 
-		public DatabaseAccess(IConfiguration configuration)
+		public DatabaseAccessService(IConfiguration configuration, IAppDbContext appDbContext)
 		{
 			_connectionString = configuration.GetConnectionString("DefaultConnection");
+			_DbContext = appDbContext;
 		}
 
 		public async Task<string> GetUserFullName(int UserId)
@@ -29,7 +36,7 @@ namespace Web_Api.Services
 						{
 							string firstName = reader["FirstName"].ToString();
 							string lastName = reader["LastName"].ToString();
-							return (firstName+" - "+lastName);
+							return (firstName + " - " + lastName);
 						}
 					}
 				}
@@ -49,7 +56,7 @@ namespace Web_Api.Services
                     END AS CanEdit
                     FROM PhoneBooks
                     WHERE ID = @PhoneBookId";
-			
+
 				using (var command = new SqlCommand(query, connection))
 				{
 					command.Parameters.AddWithValue("@UserId", userId);
@@ -65,7 +72,23 @@ namespace Web_Api.Services
 					}
 				}
 			}
-			return false;
+			return false;	
+		}
+
+		public async Task<string> GetUserFullNameWithEF(int UserId)
+		{
+			var query = @"
+			   SELECT FirstName, LastName
+			   FROM AspNetUsers
+			    WHERE Id = @UserId";
+		
+			var user = await _DbContext
+				.Users
+				.FromSqlRaw(query, new SqlParameter("@UserId", UserId))
+				.Select(u => new { u.FirstName, u.LastName })
+				.FirstOrDefaultAsync();
+
+			return user != null ? $"{user.FirstName} - {user.LastName}" : string.Empty;
 		}
 	}
 }

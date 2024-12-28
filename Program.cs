@@ -126,7 +126,7 @@ builder.Services.AddScoped<IJwt, JwtService>();
 builder.Services.AddScoped<IAuthentication, AuthenticationService>();
 builder.Services.AddScoped<JwtService>();
 
-builder.Services.AddScoped<IDatabaseAccess, DatabaseAccess>();
+builder.Services.AddScoped<IDatabaseAccess, DatabaseAccessService>();
 
 
 builder.Services.AddControllers();

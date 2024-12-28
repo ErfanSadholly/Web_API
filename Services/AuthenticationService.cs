@@ -92,14 +92,5 @@ namespace Web_Api.Services
 				Data = token
 			};
 		}
-		//public int GetCurrentUserId()
-		//{
-		//	var userIdString = _contextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-		//	if (int.TryParse(userIdString, out var userId)) 
-		//	{
-		//		return userId;
-		//	}
-		//	return -1; // یا هر مقدار پیش‌فرض که مناسب است
-		//}
 	}
 }
