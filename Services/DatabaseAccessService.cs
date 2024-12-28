@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace Web_Api.Services
@@ -72,16 +74,18 @@ namespace Web_Api.Services
 					}
 				}
 			}
-			return false;	
+			return false;
 		}
 
 		public async Task<string> GetUserFullNameWithEF(int UserId)
 		{
-			var query = @"
-			   SELECT FirstName, LastName
-			   FROM AspNetUsers
-			    WHERE Id = @UserId";
-		
+			var query = @"SELECT
+			    FirstName , LastName
+				FROM
+				AspNetUsers
+				WHERE
+				Id = @UserId";
+
 			var user = await _DbContext
 				.Users
 				.FromSqlRaw(query, new SqlParameter("@UserId", UserId))
@@ -89,6 +93,23 @@ namespace Web_Api.Services
 				.FirstOrDefaultAsync();
 
 			return user != null ? $"{user.FirstName} - {user.LastName}" : string.Empty;
+		}
+
+		public async Task<string> GetUserFullNameWithDapper(int UserId)
+		{
+			var query = @"Select
+			FirstName , LastName
+			from
+			AspNetUsers
+			Where
+			Id = @UserId";
+
+			using (var connection = new SqlConnection(_connectionString))
+			{
+				var user = await connection.QueryFirstOrDefaultAsync<User>(query, new { UserId = UserId });
+
+				return user != null ? $"{user.FirstName} - {user.LastName}" : string.Empty;
+			}
 		}
 	}
 }

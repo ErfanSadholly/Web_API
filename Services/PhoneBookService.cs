@@ -47,13 +47,13 @@ namespace Web_Api.Services
 				var dto = _mapper.Map<PhoneBookReadDto>(phone);
 
 
-				var createdByUser = await _databaseAccess.GetUserFullNameWithEF(phone.CreatedBy);
+				var createdByUser = await _databaseAccess.GetUserFullNameWithDapper(phone.CreatedBy);
 				dto.CreatedBy = createdByUser;
 
 
 				if (phone.ModifiedBy.HasValue)
 				{
-					var modifiedByUser = await _databaseAccess.GetUserFullNameWithEF(phone.ModifiedBy.Value);
+					var modifiedByUser = await _databaseAccess.GetUserFullNameWithDapper(phone.ModifiedBy.Value);
 					dto.ModifiedBy = modifiedByUser;
 				}
 				else
@@ -92,13 +92,13 @@ namespace Web_Api.Services
 			var entityDto = _mapper.Map<PhoneBookReadDto>(phoneBook);
 
 			// دریافت نام و نام خانوادگی کاربر ایجادکننده
-			var createdByUser = await _databaseAccess.GetUserFullNameWithEF(phoneBook.CreatedBy);
+			var createdByUser = await _databaseAccess.GetUserFullNameWithDapper(phoneBook.CreatedBy);
 			entityDto.CreatedBy = createdByUser;
 
 			// اگر اطلاعات مربوط به کاربر ویرایش‌کننده موجود است
 			if (phoneBook.ModifiedBy.HasValue)
 			{
-				var modifiedByUser = await _databaseAccess.GetUserFullNameWithEF(phoneBook.ModifiedBy.Value);
+				var modifiedByUser = await _databaseAccess.GetUserFullNameWithDapper(phoneBook.ModifiedBy.Value);
 				entityDto.ModifiedBy = modifiedByUser;
 			}
 			else
@@ -133,12 +133,13 @@ namespace Web_Api.Services
 
 			_loggableService.SetLoggableEntity(phonebook, userId, true);
 
+
 			await _phoneBookRepository.CreateAsync(phonebook);
 
 			return new GeneralBasicResponseDto<PhoneBook>
 			{
 				IsSuccess = true,
-				Data = phonebook
+				Data = new PhoneBook { ID = phonebook.ID }
 			};
 		}
 
@@ -174,7 +175,7 @@ namespace Web_Api.Services
 			return new GeneralBasicResponseDto<PhoneBook>
 			{
 				IsSuccess = true,
-				Data = phonebook,
+				Data = new PhoneBook { ID = phonebook.ID }
 			};
 		}
 
@@ -206,7 +207,7 @@ namespace Web_Api.Services
 			return new GeneralBasicResponseDto<PhoneBook>
 			{
 				IsSuccess = true,
-				Data = null
+				Data = new PhoneBook { ID = id }
 			};
 		}
 	}
