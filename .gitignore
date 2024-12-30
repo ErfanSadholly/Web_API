@@ -44,3 +44,4 @@ ScaffoldingReadMe.txt
 # Package directories (NuGet or other package managers)
 packages/
 /Properties/launchSettings.json
+/Models/PaginationModel/PagedResponse.cs

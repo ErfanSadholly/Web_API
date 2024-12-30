@@ -15,7 +15,7 @@ namespace WebApi.Repositories
 			_context = context;
 		}
 
-		public async Task<IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
+		public async Task <IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
 		{
 			IQueryable<PhoneBook> query = _context.PhoneBooks;
 
@@ -48,10 +48,16 @@ namespace WebApi.Repositories
 				PageSize = 5;
 			}
 
-			return await query
-			.Skip((PageIndex) * PageSize) //تعداد ریکورد ها ضربدر یدونه کمتر از تعداد صفحه
+			query = query.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
+
+		/*var data*/ return await query
+			.Skip((PageIndex) * PageSize) 
 			.Take(PageSize)
 			.ToListAsync();
+
+			//int totalCount = await query.CountAsync();
+
+			//return new PagedResponse<PhoneBook>(data, totalCount);
 		}
 
 		public async Task<PhoneBook> GetByIdAsync(int id)
