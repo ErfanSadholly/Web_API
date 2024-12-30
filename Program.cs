@@ -118,6 +118,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IPhoneBook, PhoneBookRepository>();
 builder.Services.AddScoped<PhoneBookService>();
 
+builder.Services.AddScoped<IAppDbContext, AppDbContext>();
+
 builder.Services.AddScoped<LoggableEntityService>();
 
 builder.Services.AddScoped<ClaimService, ClaimService>();

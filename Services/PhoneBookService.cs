@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using Humanizer;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Security.Claims;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
@@ -27,9 +24,10 @@ namespace Web_Api.Services
 			_httpContext = httpContext;
 		}
 
-		public async Task<GeneralBasicResponseDto<List<PhoneBookReadDto>>> GetAllAsync()
+		public async Task<GeneralBasicResponseDto<List<PhoneBookReadDto>>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber)
 		{
-			var phoneBook = await _phoneBookRepository.GetAllAsync();
+			var phoneBook = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!);
+
 			if (!phoneBook.Any())
 			{
 				return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
@@ -68,7 +66,6 @@ namespace Web_Api.Services
 
 				dtos.Add(dto);
 			}
-				//	var MapphoneBookReadDto = _mapper.Map<List<PhoneBookReadDto>>(phoneBook);
 
 				return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
 				{ 

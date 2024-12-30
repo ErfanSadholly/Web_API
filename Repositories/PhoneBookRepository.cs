@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Web_Api.AppData;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
 
@@ -14,9 +13,31 @@ namespace WebApi.Repositories
 			_context = context;
 		}
 
-		public async Task<IEnumerable<PhoneBook>> GetAllAsync()
+		public async Task<IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber)
 		{
-			return await _context.PhoneBooks.ToListAsync();
+
+			if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName) && string.IsNullOrEmpty(PhoneNumber))
+			{
+				return await _context.PhoneBooks.ToListAsync();
+			}
+			else
+			{
+				return _context.PhoneBooks.Where(x => x.LastName == LastName || x.FirstName == FirstName || x.PhoneNumber == PhoneNumber);
+			}
+
+			//if(query == FirstName)
+
+			//if (!string.IsNullOrEmpty(LastName))
+			//{
+			//	return _context.PhoneBooks.Where(x => x.LastName == LastName); 
+			//}
+			
+			//if (!string.IsNullOrEmpty(PhoneNumber))
+			//{
+			//	return _context.PhoneBooks.Where(x => x.PhoneNumber == PhoneNumber);
+			//}
+
+			//return await _context.PhoneBooks.ToListAsync();
 		}
 
 		public async Task<PhoneBook> GetByIdAsync(int id)

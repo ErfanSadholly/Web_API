@@ -24,12 +24,14 @@ namespace Web_Api.Controllers
 		}
 
 		// GET: api/Contacts
+		//[PhoneBookFilter]
+		//[ServiceFilter(typeof(PhoneBookFilterAttribute))]
 		[HttpGet]
-		public async Task<IActionResult> GetAll()
+		public async Task<IActionResult> GetAll([FromQuery] string? First_Name, string? Last_Name, string? Phone_Number)
 		{
 			try
 			{
-				var response = await _phoneBookService.GetAllAsync();
+				var response = await _phoneBookService.GetAllAsync(First_Name , Last_Name , Phone_Number);
 				if (!response.IsSuccess) 
 				{
 					return NotFound(response.Message);
