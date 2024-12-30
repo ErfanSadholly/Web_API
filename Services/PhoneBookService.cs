@@ -1,7 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
+using Web_Api.Models.PaginationModel;
 
 namespace Web_Api.Services
 {
@@ -14,7 +19,7 @@ namespace Web_Api.Services
 		private readonly ClaimService _claimService;
 		private readonly IHttpContextAccessor _httpContext;
 
-		public PhoneBookService(IPhoneBook phoneBookRepository, IMapper mapper, LoggableEntityService logService, IDatabaseAccess databaseAccess, ClaimService claimService, IHttpContextAccessor httpContext)
+		public PhoneBookService(IPhoneBook phoneBookRepository, IMapper mapper, LoggableEntityService logService, IDatabaseAccess databaseAccess, ClaimService claimService, IHttpContextAccessor httpContext, IAppDbContext dbcontext)
 		{
 			_phoneBookRepository = phoneBookRepository;
 			_mapper = mapper;
@@ -24,9 +29,9 @@ namespace Web_Api.Services
 			_httpContext = httpContext;
 		}
 
-		public async Task<GeneralBasicResponseDto<List<PhoneBookReadDto>>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber)
+		public async Task<GeneralBasicResponseDto<List<PhoneBookReadDto>>> GetAllAsync([FromQuery] string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
 		{
-			var phoneBook = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!);
+			var phoneBook = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!, PageIndex, PageSize);
 
 			if (!phoneBook.Any())
 			{
@@ -67,11 +72,11 @@ namespace Web_Api.Services
 				dtos.Add(dto);
 			}
 
-				return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
-				{ 
-					IsSuccess = true,
-					Data = dtos
-				};
+			return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
+			{
+				IsSuccess = true,
+				Data = dtos
+			}; 
 		}
 		public async Task<GeneralBasicResponseDto<PhoneBookReadDto>> GetByIdAsync(int id)
 		{
@@ -123,7 +128,7 @@ namespace Web_Api.Services
 				Data = entityDto
 			};
 		}
-		
+
 		public async Task<GeneralBasicResponseDto<PhoneBook>> CreateAsync(PhoneBookWriteDTO writeDTO, int userId)
 		{
 			var phonebook = _mapper.Map<PhoneBook>(writeDTO);

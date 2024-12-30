@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Web_Api.DTOs;
+﻿using Web_Api.DTOs;
 using Web_Api.Models.AuthModels;
 using Web_Api.Models.DbModels;
 

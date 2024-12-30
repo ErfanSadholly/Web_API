@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using Dapper;
+﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
 
 namespace Web_Api.Services
 {

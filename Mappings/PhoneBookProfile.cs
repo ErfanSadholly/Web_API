@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Web_Api.DTOs;
-using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
 using Web_Api.Models.Loggable;
-using Web_Api.Services;
 
 namespace Web_Api.Mappings
 {

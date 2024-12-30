@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
+using Web_Api.Models.PaginationModel;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebApi.Repositories
 {
@@ -13,31 +15,43 @@ namespace WebApi.Repositories
 			_context = context;
 		}
 
-		public async Task<IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber)
+		public async Task<IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
 		{
+			IQueryable<PhoneBook> query = _context.PhoneBooks;
 
-			if (string.IsNullOrEmpty(FirstName) && string.IsNullOrEmpty(LastName) && string.IsNullOrEmpty(PhoneNumber))
+			if (!string.IsNullOrEmpty(FirstName))
 			{
-				return await _context.PhoneBooks.ToListAsync();
-			}
-			else
-			{
-				return _context.PhoneBooks.Where(x => x.LastName == LastName || x.FirstName == FirstName || x.PhoneNumber == PhoneNumber);
+				query = query.Where(x => x.FirstName == FirstName);
 			}
 
-			//if(query == FirstName)
+			if (!string.IsNullOrEmpty(LastName))
+			{
+				query = query.Where(x => x.LastName.Contains(LastName));
+			}
 
-			//if (!string.IsNullOrEmpty(LastName))
-			//{
-			//	return _context.PhoneBooks.Where(x => x.LastName == LastName); 
-			//}
-			
-			//if (!string.IsNullOrEmpty(PhoneNumber))
-			//{
-			//	return _context.PhoneBooks.Where(x => x.PhoneNumber == PhoneNumber);
-			//}
+			if (!string.IsNullOrEmpty(PhoneNumber))
+			{
+				query = query.Where(x => x.PhoneNumber.Contains(PhoneNumber));
+			}
 
-			//return await _context.PhoneBooks.ToListAsync();
+			PageIndex = PageIndex < 0 ? 0 : PageIndex;
+			PageSize = PageSize <= 0 ? 5 : PageSize;
+
+			if (PageSize > 50)
+			{
+				throw new ArgumentException("شما نمیتوانید بیشتر از 50 مخاطب دریافت کنید");
+			}
+
+			if (PageIndex == null || PageSize == null) 
+			{
+				PageIndex = 0;
+				PageSize = 5;
+			}
+
+			return await query
+			.Skip((PageIndex) * PageSize) //تعداد ریکورد ها ضربدر یدونه کمتر از تعداد صفحه
+			.Take(PageSize)
+			.ToListAsync();
 		}
 
 		public async Task<PhoneBook> GetByIdAsync(int id)

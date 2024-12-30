@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Web_Api.Interfaces;
 using Web_Api.Models.AuthModels;
-using Web_Api.Services;
 
 namespace Web_Api.Controllers
 {
