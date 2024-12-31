@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -42,7 +43,9 @@ namespace Web_Api.Services
 				signingCredentials: creds
 			);
 
-			return new JwtSecurityTokenHandler().WriteToken(token);
+			var jwt_token= new JwtSecurityTokenHandler().WriteToken(token);
+
+			return $"Bearer {jwt_token}";
 		}
 	}
 }
