@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Web_Api.DTOs;
-using Web_Api.Models.PaginationModel;
 using Web_Api.Services;
 
 
@@ -33,9 +32,10 @@ namespace Web_Api.Controllers
 			try
 			{
 				var response = await _phoneBookService.GetAllAsync(First_Name, Last_Name, Phone_Number, PageIndex, PageSize);
-				if (!response.IsSuccess) 
+
+				if (!response.IsSuccess)
 				{
-					return NotFound(response.Message);
+					return NotFound(".هیچ مخاطبی یافت نشد");
 				}
 
 				return Ok(response.Data);

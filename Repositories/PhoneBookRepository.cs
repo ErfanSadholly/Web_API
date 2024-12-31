@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
-using Web_Api.Models.PaginationModel;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace WebApi.Repositories
 {
@@ -15,7 +14,7 @@ namespace WebApi.Repositories
 			_context = context;
 		}
 
-		public async Task <IEnumerable<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
+		public async Task<PagedResponseDto<PhoneBook>> GetAllAsync(string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
 		{
 			IQueryable<PhoneBook> query = _context.PhoneBooks;
 
@@ -39,7 +38,7 @@ namespace WebApi.Repositories
 
 			if (PageSize > 50)
 			{
-				throw new ArgumentException("شما نمیتوانید بیشتر از 50 مخاطب دریافت کنید");
+				PageSize = 50;
 			}
 
 			if (PageIndex == null || PageSize == null) 
@@ -48,16 +47,19 @@ namespace WebApi.Repositories
 				PageSize = 5;
 			}
 
+			int totalCount = await query.CountAsync();
+
+
 			query = query.OrderBy(x => x.LastName).ThenBy(x => x.FirstName);
 
-		/*var data*/ return await query
+			 var data = await query
 			.Skip((PageIndex) * PageSize) 
 			.Take(PageSize)
 			.ToListAsync();
 
-			//int totalCount = await query.CountAsync();
+			bool isSuccess = data.Any();
 
-			//return new PagedResponse<PhoneBook>(data, totalCount);
+			return new PagedResponseDto<PhoneBook>(data, totalCount, isSuccess);
 		}
 
 		public async Task<PhoneBook> GetByIdAsync(int id)

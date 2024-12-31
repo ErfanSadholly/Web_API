@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Drawing.Printing;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
-using Web_Api.Models.PaginationModel;
 
 namespace Web_Api.Services
 {
@@ -29,13 +25,15 @@ namespace Web_Api.Services
 			_httpContext = httpContext;
 		}
 
-		public async Task<GeneralBasicResponseDto<List<PhoneBookReadDto>>> GetAllAsync([FromQuery] string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
+		public async Task<GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>> GetAllAsync([FromQuery] string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
 		{
-			var phoneBook = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!, PageIndex, PageSize);
+			var PhoneBook_Paged_ResponseDto = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!, PageIndex, PageSize);
 
-			if (!phoneBook.Any())
+			PageSize = PageSize > 50 ? 50 : PageSize;
+
+			if (!PhoneBook_Paged_ResponseDto.Data.Any())
 			{
-				return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
+				return new GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>
 				{
 					IsSuccess = false,
 					Message = ".هیچ مخاطبی یافت نشد",
@@ -45,7 +43,7 @@ namespace Web_Api.Services
 
 			var dtos = new List<PhoneBookReadDto>();
 
-			foreach (var phone in phoneBook)
+			foreach (var phone in PhoneBook_Paged_ResponseDto.Data)
 			{
 				var dto = _mapper.Map<PhoneBookReadDto>(phone);
 
@@ -72,10 +70,12 @@ namespace Web_Api.Services
 				dtos.Add(dto);
 			}
 
-			return new GeneralBasicResponseDto<List<PhoneBookReadDto>>
+			var pagedResponseDto = new PagedResponseDto<PhoneBookReadDto>(dtos, PhoneBook_Paged_ResponseDto.TotalCount);
+
+			return new GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>
 			{
 				IsSuccess = true,
-				Data = dtos
+				Data = pagedResponseDto
 			}; 
 		}
 		public async Task<GeneralBasicResponseDto<PhoneBookReadDto>> GetByIdAsync(int id)
