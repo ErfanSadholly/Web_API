@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.Security.Claims;
 using Web_Api.DTOs;
+using Web_Api.PhoneBookRequest;
 using Web_Api.Services;
+using static Web_Api.Enums.SortEnums;
 
 
 
@@ -24,14 +27,12 @@ namespace Web_Api.Controllers
 		}
 
 		// GET: api/Contacts
-		//[PhoneBookFilter]
-		//[ServiceFilter(typeof(PhoneBookFilterAttribute))]
 		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery] string? First_Name, string? Last_Name, string? Phone_Number, int PageIndex, int PageSize)
+		public async Task<IActionResult> GetAll([FromQuery] PhoneBookRequestParameters phoneBookRequest)
 		{
 			try
 			{
-				var response = await _phoneBookService.GetAllAsync(First_Name, Last_Name, Phone_Number, PageIndex, PageSize);
+				var response = await _phoneBookService.GetAllAsync(phoneBookRequest);
 
 				if (!response.IsSuccess)
 				{
