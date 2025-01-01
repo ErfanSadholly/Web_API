@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Web_Api.AppData;
+using Web_Api.Enums;
 using Web_Api.Interfaces;
 using Web_Api.Models.AuthModels;
 using Web_Api.Models.DbModels;
@@ -21,8 +22,10 @@ var builder = WebApplication.CreateBuilder(args);
 //Add Swagger For Token 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(options => 
 {
+	options.SchemaFilter<EnumSchemaFilter>(); //Enum Filter
+
 	options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	{
 		In = ParameterLocation.Header,

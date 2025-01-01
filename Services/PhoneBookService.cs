@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using Web_Api.DTOs;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
+using Web_Api.PhoneBookRequest;
+using static Web_Api.Enums.SortEnums;
 
 namespace Web_Api.Services
 {
@@ -25,11 +28,11 @@ namespace Web_Api.Services
 			_httpContext = httpContext;
 		}
 
-		public async Task<GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>> GetAllAsync([FromQuery] string? FirstName, string? LastName, string? PhoneNumber, int PageIndex, int PageSize)
+		public async Task<GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>> GetAllAsync([FromQuery] PhoneBookRequestParameters phoneBookRequest)
 		{
-			var PhoneBook_Paged_ResponseDto = await _phoneBookRepository.GetAllAsync(FirstName!, LastName!, PhoneNumber!, PageIndex, PageSize);
+			var PhoneBook_Paged_ResponseDto = await _phoneBookRepository.GetAllAsync(phoneBookRequest);
 
-			PageSize = PageSize > 50 ? 50 : PageSize;
+			phoneBookRequest.PageSize = phoneBookRequest.PageSize > 50 ? 50 : phoneBookRequest.PageSize;
 
 			if (!PhoneBook_Paged_ResponseDto.Data.Any())
 			{
@@ -177,7 +180,7 @@ namespace Web_Api.Services
 			return new GeneralBasicResponseDto<PhoneBook>
 			{
 				IsSuccess = true,
-				Data = new PhoneBook { ID = phonebook.ID }
+				Data = phonebook
 			};
 		}
 
