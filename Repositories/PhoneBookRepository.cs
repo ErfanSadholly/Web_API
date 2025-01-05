@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using System.Net;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging.Signing;
 using Web_Api.DTOs;
+using Web_Api.Helpers;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
-using Web_Api.PhoneBookRequest;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static Web_Api.Enums.SortEnums;
-
 
 namespace WebApi.Repositories
 {
@@ -19,7 +19,7 @@ namespace WebApi.Repositories
 			_context = context;
 		}
 
-		public async Task<PagedResponseDto<PhoneBook>> GetAllAsync(PhoneBookRequestParameters phoneBookRequest)
+		public async Task<PagedResponseDto<PhoneBook>> GetAllAsync(PhoneBookRequestDto phoneBookRequest)
 		{
 			IQueryable<PhoneBook> query = _context.PhoneBooks;
 
@@ -38,24 +38,14 @@ namespace WebApi.Repositories
 				query = query.Where(x => x.PhoneNumber.Contains(phoneBookRequest.PhoneNumber));
 			}
 
-			phoneBookRequest.PageIndex = phoneBookRequest.PageIndex < 0 ? 0 : phoneBookRequest.PageIndex;
-			phoneBookRequest.PageSize = phoneBookRequest.PageSize <= 0 ? 5 : phoneBookRequest.PageSize;
-
 			if (phoneBookRequest.PageSize > 50)
 			{
 				phoneBookRequest.PageSize = 50;
 			}
 
-			if (phoneBookRequest.PageIndex == null || phoneBookRequest.PageSize == null)
-			{
-				phoneBookRequest.PageIndex = 0;
-				phoneBookRequest.PageSize = 5;
-			}
-
-
 			query = phoneBookRequest.sortKey switch
 			{
-			
+
 				Web_Api.Enums.SortEnums.SortKey.Id => phoneBookRequest.sortType == SortType.Desc
 					? query.OrderByDescending(x => x.ID)
 					: query.OrderBy(x => x.ID),
@@ -68,39 +58,19 @@ namespace WebApi.Repositories
 					? query.OrderByDescending(x => x.LastName)
 					: query.OrderBy(x => x.LastName),
 
-			   	_ => query.OrderBy(x => x.LastName)
-						  .ThenBy(x => x.FirstName)
-						  .ThenBy(x => x.ID),
+				_ => query.OrderBy(x => x.LastName)
+					   .ThenBy(x => x.FirstName)
+					   .ThenBy(x => x.ID),
 			};
 
-
 			int totalCount = await query.CountAsync();
-
-
-			//if (SortKey == "id")
-			//{
-			//	query = SortType.ToLower() == "desc" ? query.OrderByDescending(x => x.ID) : query.OrderBy(x => x.ID);
-			//}
-			//else if (SortKey == "FirstName")
-			//{
-			//	query = SortType.ToLower() == "desc" ? query.OrderByDescending(x => x.FirstName) : query.OrderBy(x => x.FirstName);
-			//}
-			//else if (SortKey == "LastName")
-			//{
-			//	query = SortType.ToLower() == "desc" ? query.OrderByDescending(x => x.LastName) : query.OrderBy(x => x.LastName);
-			//}
-			//else if (string.IsNullOrEmpty(SortKey) && string.IsNullOrEmpty(SortType))
-			//{
-			//	query = query.OrderBy(x => x.LastName).ThenBy(x => x.FirstName).ThenBy(x => x.ID);
-			//};
-		
 
 			var data = await query
 			.Skip((phoneBookRequest.PageIndex) * phoneBookRequest.PageSize)
 			.Take(phoneBookRequest.PageSize)
 			.ToListAsync();
 
-			bool isSuccess = data.Any(); 
+			bool isSuccess = data.Any();
 
 			return new PagedResponseDto<PhoneBook>(data, totalCount, isSuccess);
 		}
@@ -116,7 +86,8 @@ namespace WebApi.Repositories
 			await _context.SaveChangesAsync();
 		}
 
-		public async Task UpdateAsync(PhoneBook contact)
+		public async Task UpdateAsync(PhoneBook
+			contact)
 		{
 			_context.PhoneBooks.Update(contact);
 			await _context.SaveChangesAsync();
@@ -130,6 +101,44 @@ namespace WebApi.Repositories
 				phoneBook.Deleted = true;
 				await _context.SaveChangesAsync();
 			}
+		}
+
+		public async Task DeleteByIds(List<int> ids, int userId)
+		{
+			if (ids == null || !ids.Any() || ids.Any(id => id <= -1)) // چک کردن IDs نامعتبر
+			{
+				throw new Exception(ErrorHelper.MessageHelper.NoContactsFound);
+			}
+
+			var phoneBooks = await _context.PhoneBooks
+				.Where(pb => ids.Contains(pb.ID) && !pb.Deleted)
+				.ToListAsync();
+
+			if (!phoneBooks.Any())
+			{
+				throw new Exception(ErrorHelper.MessageHelper.NoContactsFound);
+			}
+
+			// بررسی رکوردهایی که متعلق به کاربر نیستند
+			var unauthorizedRecords = phoneBooks.Where(pb => pb.CreatedBy != userId).ToList();
+
+			// اگر هیچ‌کدام از مخاطب‌ها متعلق به کاربر نباشند
+			if (unauthorizedRecords.Any() && phoneBooks.Count == unauthorizedRecords.Count)
+			{
+				throw new Exception(ErrorHelper.MessageHelper.NotAllowDelete);
+			}
+
+			// حذف مخاطب‌هایی که متعلق به کاربر هستند
+			foreach (var phoneBook in phoneBooks)
+			{
+				if (phoneBook.CreatedBy == userId) // فقط حذف مخاطب‌هایی که متعلق به کاربر هستند
+				{
+					phoneBook.Deleted = true;
+					phoneBook.ModifiedOn = DateTime.UtcNow;
+					phoneBook.ModifiedBy = userId;
+				}
+			}
+			await _context.SaveChangesAsync();
 		}
 	}
 }

@@ -18,7 +18,7 @@ using WebApi.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//--------------------------------------------------------------------------------------------------------// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//----------------------------- Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //Add Swagger For Token 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -120,8 +120,6 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<IPhoneBook, PhoneBookRepository>();
 builder.Services.AddScoped<PhoneBookService>();
-
-builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
 builder.Services.AddScoped<LoggableEntityService>();
 

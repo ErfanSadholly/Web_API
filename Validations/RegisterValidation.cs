@@ -25,7 +25,7 @@ namespace Web_Api.Validations
 				.NotEmpty().WithMessage(".ایمیل خود را وارد کنید")
 				.EmailAddress().WithMessage(".ایمیل خود را به درستی وارد کنید");
 
-			//================================================================================================
+			//=============================================================================================================
 
 			RuleFor(x => x.Password)
 				.NotEmpty().WithMessage(".پسورد خود را وارد کنید")
@@ -34,7 +34,7 @@ namespace Web_Api.Validations
 				.Must(password => password.Any(char.IsUpper) && password[0] == char.ToUpper(password[0])).WithMessage("پسورد باید با یک حرف بزرگ شروع شود.")
 				.Must(password => password.Any(char.IsLetter) && password.Any(char.IsDigit)).WithMessage("پسورد باید شامل حروف و اعداد باشد.");
 
-			//================================================================================================
+			//==============================================================================================================
 
 			RuleFor(x => x.ConfirmPassword)
 				.NotEmpty().WithMessage(".پسورد خود را مجددا وارد کنید")

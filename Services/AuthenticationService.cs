@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using System.Security.Claims;
 using Web_Api.DTOs;
+using Web_Api.Helpers;
 using Web_Api.Interfaces;
 using Web_Api.Models.AuthModels;
 using Web_Api.Models.DbModels;
@@ -33,7 +34,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<User>()
 				{
 					IsSuccess = false,
-					Message = ".ایمیل قبلاً ثبت شده است", 
+					Message = ErrorHelper.MessageHelper.DuplicateEmail, 
 					Data = null
 				};
 			}
@@ -55,7 +56,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<User>
 				{
 					IsSuccess = false,
-					Message = ".ثبت نام با خطا مواجه شد",
+					Message = ErrorHelper.MessageHelper.ErorrRegister,
 					Data = null
 				};
 			}
@@ -69,7 +70,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<string>
 				{
 					IsSuccess = false,
-					Message = ".کاربر یافت نشد",
+					Message = ErrorHelper.MessageHelper.UserNotFound,
 					Data = null
 				};
 			}
@@ -80,7 +81,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<string>
 				{
 					IsSuccess = false,
-					Message = ".رمز عبور اشتباه است",
+					Message = ErrorHelper.MessageHelper.InvalidPassword,
 					Data = null
 				};
 			}

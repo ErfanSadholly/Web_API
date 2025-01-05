@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Core.Types;
 using System.Globalization;
 using Web_Api.DTOs;
+using Web_Api.Helpers;
 using Web_Api.Interfaces;
 using Web_Api.Models.DbModels;
-using Web_Api.PhoneBookRequest;
 using static Web_Api.Enums.SortEnums;
 
 namespace Web_Api.Services
@@ -28,7 +29,7 @@ namespace Web_Api.Services
 			_httpContext = httpContext;
 		}
 
-		public async Task<GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>> GetAllAsync([FromQuery] PhoneBookRequestParameters phoneBookRequest)
+		public async Task<GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>> GetAllAsync([FromQuery] PhoneBookRequestDto phoneBookRequest)
 		{
 			var PhoneBook_Paged_ResponseDto = await _phoneBookRepository.GetAllAsync(phoneBookRequest);
 
@@ -39,7 +40,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PagedResponseDto<PhoneBookReadDto>>
 				{
 					IsSuccess = false,
-					Message = ".هیچ مخاطبی یافت نشد",
+					Message = ErrorHelper.MessageHelper.NoContactsFound,
 					Data = null
 				};
 			}
@@ -79,7 +80,7 @@ namespace Web_Api.Services
 			{
 				IsSuccess = true,
 				Data = pagedResponseDto
-			}; 
+			};
 		}
 		public async Task<GeneralBasicResponseDto<PhoneBookReadDto>> GetByIdAsync(int id)
 		{
@@ -89,7 +90,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBookReadDto>
 				{
 					IsSuccess = false,
-					Message = "!مخاطب مورد نظر یافت نشد",
+					Message = ErrorHelper.MessageHelper.NoContactsFound,
 					Data = null
 				};
 			}
@@ -118,7 +119,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBookReadDto>
 				{
 					IsSuccess = false,
-					Message = "کاربر شناسایی نشد",
+					Message = ErrorHelper.MessageHelper.NoContactsFound,
 					Data = null
 				};
 			}
@@ -156,7 +157,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBook>
 				{
 					IsSuccess = false,
-					Message = "!مخاطب مورد نظر یافت نشد",
+					Message = ErrorHelper.MessageHelper.NoContactsFound,
 					Data = null
 				};
 			}
@@ -166,7 +167,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBook>
 				{
 					IsSuccess = false,
-					Message = "!شما اجازه ویرایش این مخاطب را ندارید",
+					Message = ErrorHelper.MessageHelper.NotAllowEdit,
 					Data = null
 				};
 			}
@@ -193,7 +194,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBook>
 				{
 					IsSuccess = false,
-					Message = "!مخاطب مورد نظر یافت نشد",
+					Message = ErrorHelper.MessageHelper.NoContactsFound,
 					Data = null
 				};
 			}
@@ -203,7 +204,7 @@ namespace Web_Api.Services
 				return new GeneralBasicResponseDto<PhoneBook>
 				{
 					IsSuccess = false,
-					Message = "!شما اجازه حذف این مخاطب را ندارید",
+					Message = ErrorHelper.MessageHelper.NotAllowEdit,
 					Data = null
 				};
 			}
@@ -214,6 +215,32 @@ namespace Web_Api.Services
 				IsSuccess = true,
 				Data = new PhoneBook { ID = id }
 			};
+		}
+		public async Task<GeneralBasicResponseDto<PhoneBook>> DeleteByIds(List<int> ids, int userId)
+		{
+			try
+			{
+				// فراخوانی متد Repository برای حذف
+				await _phoneBookRepository.DeleteByIds(ids, userId);
+
+				return new GeneralBasicResponseDto<PhoneBook>
+				{
+					IsSuccess = true,
+					Data = new PhoneBook { ID = ids[0] }
+				};
+			}
+			catch (Exception ex)
+			{
+				// بررسی نوع استثنا و تنظیم پیام مناسب
+				string errorMessage = ex.Message;
+
+				return new GeneralBasicResponseDto<PhoneBook>
+				{
+					IsSuccess = false,
+					Data = null,
+					Message = errorMessage
+				};
+			}
 		}
 	}
 }

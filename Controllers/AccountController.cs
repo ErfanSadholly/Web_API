@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Web_Api.Helpers;
 using Web_Api.Interfaces;
 using Web_Api.Models.AuthModels;
 
@@ -32,7 +33,7 @@ namespace Web_Api.Controllers
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, $"خطای داخلی سرور: {ex.Message}");
+				return StatusCode(500, ErrorHelper.MessageHelper.Error500);
 			}
 		}
 		[HttpPost("Login")]
@@ -54,7 +55,7 @@ namespace Web_Api.Controllers
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(500, $"خطای داخلی سرور: {ex.Message}"); 
+				return StatusCode(500, ErrorHelper.MessageHelper.Error500);
 			}
 		}
 	}

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Security.Claims;
 using Web_Api.DTOs;
-using Web_Api.PhoneBookRequest;
+using Web_Api.Helpers;
 using Web_Api.Services;
 using static Web_Api.Enums.SortEnums;
 
@@ -28,7 +29,7 @@ namespace Web_Api.Controllers
 
 		// GET: api/Contacts
 		[HttpGet]
-		public async Task<IActionResult> GetAll([FromQuery] PhoneBookRequestParameters phoneBookRequest)
+		public async Task<IActionResult> GetAll([FromQuery] PhoneBookRequestDto phoneBookRequest)
 		{
 			try
 			{
@@ -36,7 +37,7 @@ namespace Web_Api.Controllers
 
 				if (!response.IsSuccess)
 				{
-					return NotFound(".هیچ مخاطبی یافت نشد");
+					return NotFound(ErrorHelper.MessageHelper.NoContactsFound);
 				}
 
 				return Ok(response.Data);
@@ -58,7 +59,7 @@ namespace Web_Api.Controllers
 			try
 			{
 				var response = await _phoneBookService.GetByIdAsync(id);
-				if (!response.IsSuccess) 
+				if (!response.IsSuccess)
 				{
 					return NotFound(response.Message);
 				}
@@ -66,7 +67,7 @@ namespace Web_Api.Controllers
 				return Ok(response.Data);
 			}
 			catch (KeyNotFoundException ex)
-			{ 
+			{
 				return NotFound(ex.Message);
 			}
 			catch (Exception ex)
@@ -85,7 +86,7 @@ namespace Web_Api.Controllers
 				var userId = _claimService.GetUserIdFromClaims(User); // استخراج userId از Claims
 
 				var response = await _phoneBookService.UpdateAsync(id, PhoneBookDTO, userId);
-				if (!response.IsSuccess) 
+				if (!response.IsSuccess)
 				{
 					return NotFound(response.Message);
 				}
@@ -112,7 +113,7 @@ namespace Web_Api.Controllers
 				var userId = _claimService.GetUserIdFromClaims(User);
 
 				var response = await _phoneBookService.CreateAsync(PhoneBookDTO, userId);
-				if(!response.IsSuccess) 
+				if (!response.IsSuccess)
 				{
 					return BadRequest(response.Data.ID);
 				}
@@ -134,11 +135,11 @@ namespace Web_Api.Controllers
 				var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 				if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
 				{
-					return Unauthorized("کاربر شناسایی نشد یا اطلاعات معتبر نیست.");
+					return Unauthorized(ErrorHelper.MessageHelper.UserNotFound);
 				}
 
 				var response = await _phoneBookService.DeleteAsync(id, userId);
-				if (!response.IsSuccess) 
+				if (!response.IsSuccess)
 				{
 					return NotFound(response.Message);
 				}
@@ -152,7 +153,40 @@ namespace Web_Api.Controllers
 			catch (Exception ex)
 			{
 				return StatusCode(500, ex.Message);
-			} 
+			}
+		}
+
+		[HttpDelete("Delete_Contacts_By_Ids")]
+		public async Task<IActionResult> DeleteByIds([FromBody] List<int> ids)
+		{
+			try
+			{
+				if (ids == null || !ids.Any())
+				{
+					return BadRequest(ErrorHelper.MessageHelper.NoContactsFound);
+				}
+
+				var userId = _claimService.GetUserIdFromClaims(User);
+
+				var result = await _phoneBookService.DeleteByIds(ids, userId);
+
+				if (result.IsSuccess)
+				{
+					return NoContent();
+				}
+				else
+				{
+					return BadRequest(result.Message);
+				}
+			}
+			catch (KeyNotFoundException ex)
+			{
+				return NotFound(ex.Message);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, ex.Message);
+			}
 		}
 	}
 }
